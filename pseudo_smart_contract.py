@@ -1,30 +1,42 @@
 class SmartContract:
     def __init__(self):
-        self.balances = {}
+        self.agreements = []
 
-    def transfer(self, sender, recipient, amount):
-        if sender not in self.balances:
-            self.balances[sender] = 0
-        if recipient not in self.balances:
-            self.balances[recipient] = 0
+    def create_agreement(self, party1, party2, terms):
+        agreement = {
+            'party1': party1,
+            'party2': party2,
+            'terms': terms,
+            'status': 'pending'  # 'pending', 'accepted', 'rejected'
+        }
+        self.agreements.append(agreement)
+        return "Vereinbarung erstellt"
+
+    def accept_agreement(self, agreement_index, accepting_party):
+        if agreement_index < 0 or agreement_index >= len(self.agreements):
+            return "Ungültiger Vereinbarungsindex"
         
-        if self.balances[sender] < amount:
-            return "Nicht genügend Guthaben"
-        
-        self.balances[sender] -= amount
-        self.balances[recipient] += amount
-        return "Transaktion erfolgreich"
+        agreement = self.agreements[agreement_index]
+        if accepting_party == agreement['party1'] or accepting_party == agreement['party2']:
+            agreement['status'] = 'accepted'
+            return "Vereinbarung akzeptiert"
+        else:
+            return "Die Partei ist nicht an der Vereinbarung beteiligt"
 
 # Beispielcode zur Verwendung des Smart Contracts
 smart_contract = SmartContract()
-smart_contract.balances["Adresse1"] = 100  # Beispiel-Guthaben für Adresse1
-smart_contract.balances["Adresse2"] = 50   # Beispiel-Guthaben für Adresse2
 
-# Transaktion ausführen
-sender = "Adresse1"
-recipient = "Adresse2"
-amount = 30
-result = smart_contract.transfer(sender, recipient, amount)
+# Erstellen einer Vereinbarung
+party1 = "Alice"
+party2 = "Bob"
+terms = "Alice verkauft Bob ein digitales Kunstwerk für 50 Token."
+smart_contract.create_agreement(party1, party2, terms)
+
+# Akzeptieren der Vereinbarung
+agreement_index = 0
+accepting_party = "Bob"
+result = smart_contract.accept_agreement(agreement_index, accepting_party)
 print(result)
-print("Aktuelles Guthaben von Adresse1:", smart_contract.balances[sender])
-print("Aktuelles Guthaben von Adresse2:", smart_contract.balances[recipient])
+
+# Überprüfen des Status der Vereinbarung
+print("Status der Vereinbarung:", smart_contract.agreements[agreement_index]['status'])
